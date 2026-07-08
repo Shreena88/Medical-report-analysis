@@ -27,6 +27,25 @@ class LabTest(BaseModel):
     explanation: str | None = None
 
 
+class SystemStatus(BaseModel):
+    """Status details for a specific physiological organ system."""
+
+    system_name: str
+    status: Literal["Optimal", "Needs Attention"]
+    marker_count: int
+    notes: str
+
+
+class ClinicalOverview(BaseModel):
+    """Multi-dimensional AI educational summary of the patient's report."""
+
+    summary: str
+    primary_findings: list[str] = Field(default_factory=list)
+    affected_systems: list[SystemStatus] = Field(default_factory=list)
+    questions_for_doctor: list[str] = Field(default_factory=list)
+    lifestyle_considerations: list[str] = Field(default_factory=list)
+
+
 class Report(BaseModel):
     """Full report document as stored in MongoDB.
 
@@ -45,6 +64,7 @@ class Report(BaseModel):
     ocr_text: str | None = None
     lab_tests: list[LabTest] = []
     summary: str | None = None
+    clinical_overview: ClinicalOverview | None = None
     error_message: str | None = None
 
 

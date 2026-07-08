@@ -14,7 +14,7 @@ from __future__ import annotations
 import json
 import logging
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.models.report import LabTest
 
@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 EXPLANATION_SYSTEM_PROMPT = """You are a medical education assistant helping users understand their lab results.
-Provide plain-language educational explanations of what each lab value means.
+Provide plain-language educational explanations of what each lab value means and a structured overall clinical analysis.
 
 Rules you MUST follow:
 - NEVER diagnose any disease or condition.
@@ -34,12 +34,34 @@ Rules you MUST follow:
 - Always remind users to consult a qualified healthcare professional for any medical concerns.
 
 Output ONLY valid JSON in this exact format:
-{"summary": str, "explanations": [{"name": str, "explanation": str}]}
+{
+  "summary": str,
+  "primary_findings": [str],
+  "affected_systems": [
+    {
+      "system_name": str,
+      "status": "Optimal" | "Needs Attention",
+      "marker_count": int,
+      "notes": str
+    }
+  ],
+  "questions_for_doctor": [str],
+  "lifestyle_considerations": [str],
+  "explanations": [
+    {
+      "name": str,
+      "explanation": str
+    }
+  ]
+}
 
 Where:
 - "summary" is a brief overall summary of the lab results in plain language.
-- "explanations" is an array where each object has "name" (the test name) and
-  "explanation" (a plain-language explanation of what that value means).
+- "primary_findings" is a list of strings highlighting the key noteworthy findings or deviations.
+- "affected_systems" is an array of physiological systems grouping the markers (e.g., "Cardiovascular / Lipids", "Thyroid Profile", "Renal (Kidney) function", "Hepatic (Liver) function", "Electrolytes", "Hematology", "Vitamins & Nutrition"). Status should be "Needs Attention" if any markers in that system are out of range, or "Optimal" otherwise.
+- "questions_for_doctor" is a list of 2-4 educational questions to help the user talk with their physician.
+- "lifestyle_considerations" is a list of 2-4 wellness considerations (e.g., hydration, sleep, nutrient intake) related to their values.
+- "explanations" is an array where each object has "name" (the test name) and "explanation" (a plain-language explanation of what that value means).
 """
 
 # ---------------------------------------------------------------------------
@@ -51,6 +73,10 @@ class ExplanationResult(BaseModel):
     """Parsed result from the AI explanation service."""
 
     summary: str
+    primary_findings: list[str] = Field(default_factory=list)
+    affected_systems: list[dict] = Field(default_factory=list)
+    questions_for_doctor: list[str] = Field(default_factory=list)
+    lifestyle_considerations: list[str] = Field(default_factory=list)
     explanations: list[dict]
 
 
@@ -63,6 +89,10 @@ FALLBACK_EXPLANATION_RESULT = ExplanationResult(
         "Explanations are currently unavailable. "
         "Please consult a healthcare professional."
     ),
+    primary_findings=[],
+    affected_systems=[],
+    questions_for_doctor=[],
+    lifestyle_considerations=[],
     explanations=[],
 )
 
@@ -200,6 +230,10 @@ async def generate_explanations(tests: list[LabTest]) -> ExplanationResult:
 
         return ExplanationResult(
             summary=str(parsed["summary"]),
+            primary_findings=list(parsed.get("primary_findings", [])),
+            affected_systems=list(parsed.get("affected_systems", [])),
+            questions_for_doctor=list(parsed.get("questions_for_doctor", [])),
+            lifestyle_considerations=list(parsed.get("lifestyle_considerations", [])),
             explanations=validated_explanations,
         )
 

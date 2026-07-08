@@ -13,6 +13,21 @@ interface LabTest {
   explanation: string | null;
 }
 
+interface SystemStatus {
+  system_name: string;
+  status: 'Optimal' | 'Needs Attention';
+  marker_count: number;
+  notes: string;
+}
+
+interface ClinicalOverview {
+  summary: string;
+  primary_findings: string[];
+  affected_systems: SystemStatus[];
+  questions_for_doctor: string[];
+  lifestyle_considerations: string[];
+}
+
 interface Report {
   id: string;
   file_name: string;
@@ -22,6 +37,7 @@ interface Report {
   ocr_text: string | null;
   lab_tests: LabTest[];
   summary: string | null;
+  clinical_overview: ClinicalOverview | null;
   error_message: string | null;
 }
 
@@ -223,14 +239,135 @@ const ReportDetailPage: React.FC = () => {
             {/* Medical Disclaimer Banner */}
             <MedicalDisclaimer />
 
-            {/* AI Summary Box */}
-            {report.summary && (
-              <div className="rounded-2xl border border-violet-500/20 bg-gradient-to-r from-slate-900/60 to-slate-900/40 p-6 backdrop-blur-sm">
-                <h3 className="text-sm font-bold tracking-wider uppercase text-violet-400">Clinical Overview</h3>
-                <p className="mt-3 text-slate-250 leading-relaxed text-sm md:text-base font-light whitespace-pre-line">
-                  {report.summary}
-                </p>
+            {/* AI Summary & Clinical Dashboard */}
+            {report.clinical_overview ? (
+              <div className="space-y-6">
+                {/* 1. Main Summary and Primary Findings */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Left 2 cols: Summary */}
+                  <div className="lg:col-span-2 rounded-2xl border border-violet-500/20 bg-gradient-to-r from-slate-900/60 to-slate-900/40 p-6 backdrop-blur-sm flex flex-col justify-between">
+                    <div>
+                      <h3 className="text-xs font-bold tracking-wider uppercase text-violet-400">Clinical Overview Summary</h3>
+                      <p className="mt-3 text-slate-200 leading-relaxed text-sm md:text-base font-light whitespace-pre-line">
+                        {report.clinical_overview.summary}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Right 1 col: Key findings */}
+                  <div className="rounded-2xl border border-slate-800 bg-slate-900/30 p-6 backdrop-blur-sm">
+                    <h3 className="text-xs font-bold tracking-wider uppercase text-rose-450">Key Findings</h3>
+                    <ul className="mt-4 space-y-3">
+                      {report.clinical_overview.primary_findings && report.clinical_overview.primary_findings.length > 0 ? (
+                        report.clinical_overview.primary_findings.map((finding, idx) => (
+                          <li key={idx} className="flex items-start gap-2 text-xs text-slate-300 font-light leading-relaxed">
+                            <span className="mt-1 flex h-1.5 w-1.5 shrink-0 rounded-full bg-rose-500"></span>
+                            {finding}
+                          </li>
+                        ))
+                      ) : (
+                        <li className="text-xs text-slate-500 font-light">No critical deviations detected in the analyzed tests.</li>
+                      )}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* 2. Physiological System Breakdown */}
+                {report.clinical_overview.affected_systems && report.clinical_overview.affected_systems.length > 0 && (
+                  <div className="space-y-4">
+                    <h3 className="text-base font-bold text-slate-200">Organ & Physiological Systems Check</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {report.clinical_overview.affected_systems.map((sys, idx) => {
+                        const isAttention = sys.status === 'Needs Attention';
+                        return (
+                          <div 
+                            key={idx} 
+                            className={`rounded-xl border p-4 backdrop-blur-sm transition-all duration-200 hover:border-slate-700 ${
+                              isAttention 
+                                ? 'border-amber-500/10 bg-amber-500/5' 
+                                : 'border-slate-800 bg-slate-900/10'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between gap-2 border-b border-slate-800/40 pb-2">
+                              <h4 className="text-sm font-semibold text-slate-100 truncate">{sys.system_name}</h4>
+                              <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                                isAttention 
+                                  ? 'bg-amber-500/10 text-amber-450 border border-amber-500/20' 
+                                  : 'bg-emerald-500/10 text-emerald-450 border border-emerald-500/20'
+                              }`}>
+                                {sys.status}
+                              </span>
+                            </div>
+                            <div className="mt-3 space-y-1">
+                              <p className="text-[10px] text-slate-500">
+                                {sys.marker_count > 0 
+                                  ? `${sys.marker_count} metric${sys.marker_count > 1 ? 's' : ''} out of range` 
+                                  : 'All metrics within range'}
+                              </p>
+                              <p className="text-xs text-slate-300 font-light leading-relaxed mt-1">
+                                {sys.notes}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* 3. Next Steps: Questions for Physician & Lifestyle Considerations */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Physician Questions */}
+                  {report.clinical_overview.questions_for_doctor && report.clinical_overview.questions_for_doctor.length > 0 && (
+                    <div className="rounded-2xl border border-violet-500/10 bg-violet-500/5 p-6 backdrop-blur-sm">
+                      <div className="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-5 w-5 text-violet-400">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 0 1-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8Z" />
+                        </svg>
+                        <h3 className="text-sm font-bold text-violet-300 uppercase tracking-wider">Suggested Questions for Your Doctor</h3>
+                      </div>
+                      <ul className="mt-4 space-y-3">
+                        {report.clinical_overview.questions_for_doctor.map((q, idx) => (
+                          <li key={idx} className="flex items-start gap-2.5 text-xs text-slate-350 leading-relaxed font-light">
+                            <span className="text-violet-400 font-semibold">{idx + 1}.</span>
+                            <span>"{q}"</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Lifestyle Considerations */}
+                  {report.clinical_overview.lifestyle_considerations && report.clinical_overview.lifestyle_considerations.length > 0 && (
+                    <div className="rounded-2xl border border-emerald-500/10 bg-emerald-500/5 p-6 backdrop-blur-sm">
+                      <div className="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-5 w-5 text-emerald-400">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+                        <h3 className="text-sm font-bold text-emerald-300 uppercase tracking-wider">Wellness & Lifestyle Habits</h3>
+                      </div>
+                      <ul className="mt-4 space-y-3">
+                        {report.clinical_overview.lifestyle_considerations.map((item, idx) => (
+                          <li key={idx} className="flex items-start gap-2.5 text-xs text-slate-350 leading-relaxed font-light">
+                            <span className="text-emerald-400 font-semibold">•</span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
               </div>
+            ) : (
+              /* Fallback to simple summary if clinical_overview is not populated */
+              report.summary && (
+                <div className="rounded-2xl border border-violet-500/20 bg-gradient-to-r from-slate-900/60 to-slate-900/40 p-6 backdrop-blur-sm">
+                  <h3 className="text-sm font-bold tracking-wider uppercase text-violet-400">Clinical Overview</h3>
+                  <p className="mt-3 text-slate-250 leading-relaxed text-sm md:text-base font-light whitespace-pre-line">
+                    {report.summary}
+                  </p>
+                </div>
+              )
             )}
 
             {/* Extracted Lab Tests Results */}

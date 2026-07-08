@@ -163,6 +163,13 @@ async def run_pipeline(
             "$set": {
                 "lab_tests": [t.model_dump() for t in tests_with_explanations],
                 "summary": result.summary,
+                "clinical_overview": {
+                    "summary": result.summary,
+                    "primary_findings": result.primary_findings,
+                    "affected_systems": result.affected_systems,
+                    "questions_for_doctor": result.questions_for_doctor,
+                    "lifestyle_considerations": result.lifestyle_considerations,
+                },
                 "status": "complete",
             }
         },

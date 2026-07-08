@@ -52,7 +52,7 @@ REFERENCE_RANGES: list[dict] = [
     },
     {
         "test_name": "Blood Sugar",
-        "aliases": ["Glucose", "Fasting Blood Glucose", "FBG", "Blood Glucose", "FBS"],
+        "aliases": ["Glucose", "Fasting Blood Glucose", "FBG", "Blood Glucose", "FBS", "Glu"],
         "unit": "mg/dL",
         "male_min": 70.0,
         "male_max": 100.0,
@@ -61,7 +61,7 @@ REFERENCE_RANGES: list[dict] = [
         "description": (
             "Fasting blood glucose measures the amount of sugar in the blood after "
             "an overnight fast. Values between 100–125 mg/dL suggest prediabetes; "
-            "values ≥126 mg/dL on two separate tests suggest diabetes."
+            "values >=126 mg/dL on two separate tests suggest diabetes."
         ),
     },
     {
@@ -194,6 +194,292 @@ REFERENCE_RANGES: list[dict] = [
             "AST is an enzyme found in the liver, heart, muscles, and kidneys. "
             "Elevated AST can indicate liver disease, heart attack, or muscle damage. "
             "It is usually interpreted alongside ALT for liver assessment."
+        ),
+    },
+    {
+        "test_name": "HbA1c",
+        "aliases": ["Hemoglobin A1c", "A1c", "Glycohemoglobin", "Glycated Hemoglobin"],
+        "unit": "%",
+        "male_min": 4.0,
+        "male_max": 5.6,
+        "female_min": 4.0,
+        "female_max": 5.6,
+        "description": (
+            "HbA1c measures the average blood sugar level over the past 2-3 months. "
+            "It is a key indicator for diagnosing and monitoring prediabetes and diabetes."
+        ),
+    },
+    {
+        "test_name": "TSH",
+        "aliases": ["Thyrotropin", "Thyroid-Stimulating Hormone", "Thyroid Stimulating Hormone"],
+        "unit": "uIU/mL",
+        "male_min": 0.4,
+        "male_max": 4.0,
+        "female_min": 0.4,
+        "female_max": 4.0,
+        "description": (
+            "TSH is produced by the pituitary gland to control thyroid hormone production. "
+            "High levels suggest hypothyroidism (underactive thyroid); low levels suggest hyperthyroidism (overactive thyroid)."
+        ),
+    },
+    {
+        "test_name": "Free T4",
+        "aliases": ["Free Thyroxine", "FT4"],
+        "unit": "ng/dL",
+        "male_min": 0.8,
+        "male_max": 1.8,
+        "female_min": 0.8,
+        "female_max": 1.8,
+        "description": (
+            "Free T4 measures the active form of thyroxine in the blood. Together with TSH, "
+            "it is used to evaluate thyroid gland function."
+        ),
+    },
+    {
+        "test_name": "Free T3",
+        "aliases": ["Free Triiodothyronine", "FT3"],
+        "unit": "pg/mL",
+        "male_min": 2.3,
+        "male_max": 4.2,
+        "female_min": 2.3,
+        "female_max": 4.2,
+        "description": (
+            "Free T3 measures the active form of triiodothyronine. It is useful in diagnosing "
+            "hyperthyroidism and monitoring thyroid hormone replacement therapy."
+        ),
+    },
+    {
+        "test_name": "Total Cholesterol",
+        "aliases": ["Cholesterol", "Total Chol", "TC"],
+        "unit": "mg/dL",
+        "male_min": 100.0,
+        "male_max": 200.0,
+        "female_min": 100.0,
+        "female_max": 200.0,
+        "description": (
+            "Total Cholesterol measures the overall amount of cholesterol in the blood. "
+            "Elevated levels are associated with increased cardiovascular disease risk."
+        ),
+    },
+    {
+        "test_name": "LDL Cholesterol",
+        "aliases": ["LDL-C", "Low Density Lipoprotein", "Bad Cholesterol", "LDL"],
+        "unit": "mg/dL",
+        "male_min": 0.0,
+        "male_max": 100.0,
+        "female_min": 0.0,
+        "female_max": 100.0,
+        "description": (
+            "LDL is known as 'bad' cholesterol because high levels can lead to plaque "
+            "buildup in arteries, raising the risk of heart disease and stroke."
+        ),
+    },
+    {
+        "test_name": "HDL Cholesterol",
+        "aliases": ["HDL-C", "High Density Lipoprotein", "Good Cholesterol", "HDL"],
+        "unit": "mg/dL",
+        "male_min": 40.0,
+        "male_max": 60.0,
+        "female_min": 50.0,
+        "female_max": 60.0,
+        "description": (
+            "HDL is the 'good' cholesterol because it helps remove other forms of "
+            "cholesterol from your bloodstream. Higher levels are generally cardioprotective."
+        ),
+    },
+    {
+        "test_name": "Triglycerides",
+        "aliases": ["TRIG", "TG", "Trig", "Triglyceride"],
+        "unit": "mg/dL",
+        "male_min": 0.0,
+        "male_max": 150.0,
+        "female_min": 0.0,
+        "female_max": 150.0,
+        "description": (
+            "Triglycerides are a type of fat found in your blood. High levels can "
+            "increase the risk of heart disease, especially when combined with high LDL."
+        ),
+    },
+    {
+        "test_name": "Sodium",
+        "aliases": ["Na", "Serum Sodium", "Sodium, Serum"],
+        "unit": "mEq/L",
+        "male_min": 135.0,
+        "male_max": 145.0,
+        "female_min": 135.0,
+        "female_max": 145.0,
+        "description": (
+            "Sodium is a key electrolyte regulating water balance, blood pressure, "
+            "and nerve/muscle function. Low levels (hyponatremia) or high levels can cause neurological symptoms."
+        ),
+    },
+    {
+        "test_name": "Potassium",
+        "aliases": ["K", "Serum Potassium", "Potassium, Serum"],
+        "unit": "mEq/L",
+        "male_min": 3.5,
+        "male_max": 5.0,
+        "female_min": 3.5,
+        "female_max": 5.0,
+        "description": (
+            "Potassium is an essential electrolyte for nerve signaling and muscle control, "
+            "particularly in the heart. Minor deviations can lead to muscle weakness or arrhythmias."
+        ),
+    },
+    {
+        "test_name": "Chloride",
+        "aliases": ["Cl", "Serum Chloride"],
+        "unit": "mEq/L",
+        "male_min": 96.0,
+        "male_max": 106.0,
+        "female_min": 96.0,
+        "female_max": 106.0,
+        "description": (
+            "Chloride helps maintain proper blood volume, blood pressure, and acid-base balance "
+            "in the body. Changes are often linked to kidney issues or severe dehydration."
+        ),
+    },
+    {
+        "test_name": "Calcium",
+        "aliases": ["Ca", "Serum Calcium", "Total Calcium"],
+        "unit": "mg/dL",
+        "male_min": 8.5,
+        "male_max": 10.2,
+        "female_min": 8.5,
+        "female_max": 10.2,
+        "description": (
+            "Calcium is critical for bones, muscle contraction, and blood clotting. "
+            "Abnormal levels can point to kidney disease, parathyroid issues, or bone disorders."
+        ),
+    },
+    {
+        "test_name": "BUN",
+        "aliases": ["Blood Urea Nitrogen", "Urea Nitrogen", "Urea"],
+        "unit": "mg/dL",
+        "male_min": 7.0,
+        "male_max": 20.0,
+        "female_min": 7.0,
+        "female_max": 20.0,
+        "description": (
+            "Blood Urea Nitrogen measures kidney function by analyzing urea levels. "
+            "High levels suggest impaired kidney function, dehydration, or high protein intake."
+        ),
+    },
+    {
+        "test_name": "Total Bilirubin",
+        "aliases": ["Bili", "Bilirubin Total", "Bilirubin", "Total Bili"],
+        "unit": "mg/dL",
+        "male_min": 0.1,
+        "male_max": 1.2,
+        "female_min": 0.1,
+        "female_max": 1.2,
+        "description": (
+            "Bilirubin is produced during the normal breakdown of red blood cells. "
+            "High levels can cause jaundice and indicate liver dysfunction or bile duct blockages."
+        ),
+    },
+    {
+        "test_name": "Alkaline Phosphatase",
+        "aliases": ["ALP", "Alk Phos", "Alkaline Phos"],
+        "unit": "U/L",
+        "male_min": 44.0,
+        "male_max": 147.0,
+        "female_min": 44.0,
+        "female_max": 147.0,
+        "description": (
+            "ALP is an enzyme found in liver, bile ducts, and bones. High levels "
+            "commonly indicate liver disease, blocked bile ducts, or bone conditions."
+        ),
+    },
+    {
+        "test_name": "Albumin",
+        "aliases": ["Alb", "Serum Albumin"],
+        "unit": "g/dL",
+        "male_min": 3.4,
+        "male_max": 5.4,
+        "female_min": 3.4,
+        "female_max": 5.4,
+        "description": (
+            "Albumin is a protein synthesized by the liver that prevents fluid leakage. "
+            "Low levels indicate nutritional deficiency, liver damage, or kidney disease."
+        ),
+    },
+    {
+        "test_name": "Vitamin B12",
+        "aliases": ["Cobalamin", "B12", "Cyanocobalamin"],
+        "unit": "pg/mL",
+        "male_min": 200.0,
+        "male_max": 900.0,
+        "female_min": 200.0,
+        "female_max": 900.0,
+        "description": (
+            "Vitamin B12 is essential for DNA synthesis, nerve health, and red blood cell production. "
+            "Deficiency can cause megaloblastic anemia and neuropathy."
+        ),
+    },
+    {
+        "test_name": "CRP",
+        "aliases": ["C-Reactive Protein", "hs-CRP", "High-Sensitivity CRP"],
+        "unit": "mg/L",
+        "male_min": 0.0,
+        "male_max": 3.0,
+        "female_min": 0.0,
+        "female_max": 3.0,
+        "description": (
+            "C-Reactive Protein increases during general inflammation or active infections. "
+            "Elevated levels are markers for chronic inflammatory conditions and cardiovascular risk."
+        ),
+    },
+    {
+        "test_name": "MCV",
+        "aliases": ["Mean Corpuscular Volume", "MCV Count"],
+        "unit": "fL",
+        "male_min": 80.0,
+        "male_max": 100.0,
+        "female_min": 80.0,
+        "female_max": 100.0,
+        "description": (
+            "MCV measures the average size of red blood cells. High MCV suggests "
+            "macrocytic anemia (e.g., Vitamin B12 or Folate deficiency); low MCV suggests microcytic anemia (e.g., Iron deficiency)."
+        ),
+    },
+    {
+        "test_name": "MCH",
+        "aliases": ["Mean Corpuscular Hemoglobin", "MCH Count"],
+        "unit": "pg",
+        "male_min": 27.0,
+        "male_max": 33.0,
+        "female_min": 27.0,
+        "female_max": 33.0,
+        "description": (
+            "MCH measures the average amount of hemoglobin inside a single red blood cell. "
+            "It fluctuates in parallel with MCV and is useful in determining the type of anemia."
+        ),
+    },
+    {
+        "test_name": "MCHC",
+        "aliases": ["Mean Corpuscular Hemoglobin Concentration"],
+        "unit": "g/dL",
+        "male_min": 32.0,
+        "male_max": 36.0,
+        "female_min": 32.0,
+        "female_max": 36.0,
+        "description": (
+            "MCHC measures the average concentration of hemoglobin inside red blood cells. "
+            "Low levels indicate hypochromic anemia (such as iron deficiency)."
+        ),
+    },
+    {
+        "test_name": "RDW",
+        "aliases": ["Red Cell Distribution Width", "RDW-CV", "RDW-SD"],
+        "unit": "%",
+        "male_min": 11.0,
+        "male_max": 15.0,
+        "female_min": 11.0,
+        "female_max": 15.0,
+        "description": (
+            "RDW measures the variation in red blood cell size. High variation (anisocytosis) "
+            "is an early sign of iron, B12, or folate deficiency anemias."
         ),
     },
 ]

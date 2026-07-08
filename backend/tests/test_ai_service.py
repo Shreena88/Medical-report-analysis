@@ -249,12 +249,23 @@ async def test_valid_response_parsed_correctly():
             "Your lab results are generally within normal range. "
             "Please consult a qualified healthcare professional for guidance."
         ),
+        "primary_findings": ["No high-risk deviations detected."],
+        "affected_systems": [
+            {
+                "system_name": "Hematology",
+                "status": "Optimal",
+                "marker_count": 0,
+                "notes": "Red and white blood cell levels are optimal."
+            }
+        ],
+        "questions_for_doctor": ["What does my hemoglobin level indicate about my oxygen capacity?"],
+        "lifestyle_considerations": ["Continue a balanced nutrition rich in iron."],
         "explanations": [
             {
                 "name": "Hemoglobin",
                 "explanation": (
                     "Hemoglobin carries oxygen in your blood. "
-                    "Your level is within the normal range."
+                    "Your level is within the range."
                 ),
             },
             {
@@ -281,6 +292,11 @@ async def test_valid_response_parsed_correctly():
 
     assert isinstance(result, ExplanationResult)
     assert "normal range" in result.summary.lower()
+    assert result.primary_findings == ["No high-risk deviations detected."]
+    assert len(result.affected_systems) == 1
+    assert result.affected_systems[0]["system_name"] == "Hematology"
+    assert result.questions_for_doctor == ["What does my hemoglobin level indicate about my oxygen capacity?"]
+    assert result.lifestyle_considerations == ["Continue a balanced nutrition rich in iron."]
     assert len(result.explanations) == 2
 
     hgb = result.explanations[0]
@@ -381,6 +397,10 @@ def test_system_prompt_specifies_json_output_format():
     assert "summary" in EXPLANATION_SYSTEM_PROMPT, (
         "EXPLANATION_SYSTEM_PROMPT must specify the 'summary' field in JSON format."
     )
+    assert "primary_findings" in EXPLANATION_SYSTEM_PROMPT
+    assert "affected_systems" in EXPLANATION_SYSTEM_PROMPT
+    assert "questions_for_doctor" in EXPLANATION_SYSTEM_PROMPT
+    assert "lifestyle_considerations" in EXPLANATION_SYSTEM_PROMPT
     assert "explanations" in EXPLANATION_SYSTEM_PROMPT, (
         "EXPLANATION_SYSTEM_PROMPT must specify the 'explanations' array."
     )

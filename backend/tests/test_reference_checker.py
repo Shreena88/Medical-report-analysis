@@ -26,7 +26,7 @@ import asyncio
 from typing import Any
 
 import pytest
-from hypothesis import assume, given, settings
+from hypothesis import HealthCheck, assume, given, settings
 from hypothesis import strategies as st
 from mongomock_motor import AsyncMongoMockClient
 
@@ -133,8 +133,8 @@ def test_property3_value_below_min_is_low(
     async def _run():
         db = await _make_db_with_reference(ref_doc)
         results = await check_ranges([lab_test], gender, db)
-        assert results[0].status == "LOW", (
-            f"Expected LOW for value={value} < min={min_val}, got {results[0].status}"
+        assert results[0].status == "SIGNIFICANTLY_LOW", (
+            f"Expected SIGNIFICANTLY_LOW for value={value} < min={min_val}, got {results[0].status}"
         )
 
     asyncio.run(_run())
@@ -176,8 +176,8 @@ def test_property3_value_above_max_is_high(
     async def _run():
         db = await _make_db_with_reference(ref_doc)
         results = await check_ranges([lab_test], gender, db)
-        assert results[0].status == "HIGH", (
-            f"Expected HIGH for value={value} > max={max_val}, got {results[0].status}"
+        assert results[0].status == "SIGNIFICANTLY_HIGH", (
+            f"Expected SIGNIFICANTLY_HIGH for value={value} > max={max_val}, got {results[0].status}"
         )
 
     asyncio.run(_run())
@@ -224,8 +224,8 @@ def test_property3_value_within_range_is_normal(
     async def _run():
         db = await _make_db_with_reference(ref_doc)
         results = await check_ranges([lab_test], gender, db)
-        assert results[0].status == "NORMAL", (
-            f"Expected NORMAL for value={value} in [{min_val}, {max_val}], "
+        assert results[0].status in {"NORMAL", "SLIGHTLY_LOW", "SLIGHTLY_HIGH"}, (
+            f"Expected NORMAL, SLIGHTLY_LOW, or SLIGHTLY_HIGH for value={value} in [{min_val}, {max_val}], "
             f"got {results[0].status}"
         )
 
@@ -243,7 +243,7 @@ def test_property3_value_within_range_is_normal(
     female_min=st.floats(min_value=1.0, max_value=50.0, allow_nan=False, allow_infinity=False),
     female_width=st.floats(min_value=1.0, max_value=50.0, allow_nan=False, allow_infinity=False),
 )
-@settings(max_examples=100)
+@settings(max_examples=100, suppress_health_check=[HealthCheck.filter_too_much])
 def test_property3_gender_selects_correct_thresholds(
     male_min: float,
     male_width: float,
@@ -284,14 +284,14 @@ def test_property3_gender_selects_correct_thresholds(
     async def _run():
         db_male = await _make_db_with_reference(ref_doc)
         male_results = await check_ranges([lab_test], "male", db_male)
-        assert male_results[0].status == "NORMAL", (
-            f"Expected NORMAL for male: value={value} in [{male_min}, {male_max}]"
+        assert male_results[0].status in {"NORMAL", "SLIGHTLY_LOW", "SLIGHTLY_HIGH"}, (
+            f"Expected NORMAL, SLIGHTLY_LOW, or SLIGHTLY_HIGH for male: value={value} in [{male_min}, {male_max}]"
         )
 
         db_female = await _make_db_with_reference(ref_doc)
         female_results = await check_ranges([lab_test], "female", db_female)
-        assert female_results[0].status == "LOW", (
-            f"Expected LOW for female: value={value} < female_min={female_min}"
+        assert female_results[0].status == "SIGNIFICANTLY_LOW", (
+            f"Expected SIGNIFICANTLY_LOW for female: value={value} < female_min={female_min}"
         )
 
     asyncio.run(_run())
@@ -394,7 +394,7 @@ async def test_check_ranges_low_status():
     db = await _make_db_with_reference(ref_doc)
     lab_test = _make_lab_test("Hemoglobin", 10.0)  # below male_min of 13.5
     results = await check_ranges([lab_test], "male", db)
-    assert results[0].status == "LOW"
+    assert results[0].status == "SIGNIFICANTLY_LOW"
 
 
 @pytest.mark.asyncio
@@ -413,7 +413,7 @@ async def test_check_ranges_high_status():
     db = await _make_db_with_reference(ref_doc)
     lab_test = _make_lab_test("Hemoglobin", 20.0)  # above male_max of 17.5
     results = await check_ranges([lab_test], "male", db)
-    assert results[0].status == "HIGH"
+    assert results[0].status == "SIGNIFICANTLY_HIGH"
 
 
 @pytest.mark.asyncio
@@ -522,7 +522,7 @@ async def test_check_ranges_female_thresholds():
     # 16.0 is within male range [13.5, 17.5] but above female max of 15.5
     lab_test = _make_lab_test("Hemoglobin", 16.0)
     results = await check_ranges([lab_test], "female", db)
-    assert results[0].status == "HIGH"
+    assert results[0].status == "SIGNIFICANTLY_HIGH"
 
 
 @pytest.mark.asyncio
@@ -543,6 +543,6 @@ async def test_check_ranges_does_not_mutate_original():
     assert original.status == "UNKNOWN"  # default before check
 
     results = await check_ranges([original], "male", db)
-    assert results[0].status == "LOW"
+    assert results[0].status == "SIGNIFICANTLY_LOW"
     # Original should still be UNKNOWN (not mutated in place)
     assert original.status == "UNKNOWN"

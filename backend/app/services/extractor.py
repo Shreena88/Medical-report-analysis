@@ -58,9 +58,9 @@ def _get_groq_client():
     """
     global _groq_client
     if _groq_client is None:
-        from groq import Groq  # lazy import of the groq package
+        from groq import AsyncGroq  # lazy import of the groq package
         from app.config import settings
-        _groq_client = Groq(api_key=settings.GROQ_API_KEY)
+        _groq_client = AsyncGroq(api_key=settings.GROQ_API_KEY)
     return _groq_client
 
 
@@ -98,7 +98,7 @@ async def extract_tests(ocr_text: str) -> list[LabTest]:
     client = _get_groq_client()
 
     try:
-        response = client.chat.completions.create(
+        response = await client.chat.completions.create(
             model=settings.GROQ_MODEL,
             messages=[
                 {"role": "system", "content": EXTRACTION_SYSTEM_PROMPT},

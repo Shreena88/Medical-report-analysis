@@ -60,8 +60,9 @@ async def run_pipeline(
     # ------------------------------------------------------------------
     # Step 1 — OCR
     # ------------------------------------------------------------------
+    import asyncio
     try:
-        ocr_text = get_ocr_provider().extract_text(file_path)
+        ocr_text = await asyncio.to_thread(get_ocr_provider().extract_text, file_path)
     except OCRError as exc:
         logger.error("run_pipeline[%s]: OCR failed: %s", report_id, exc)
         await db["reports"].update_one(

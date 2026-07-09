@@ -60,8 +60,9 @@ def _make_groq_response(content: str) -> MagicMock:
 
 def _mock_client(mock_response: MagicMock) -> MagicMock:
     """Return a mock Groq client whose create() returns mock_response."""
+    from unittest.mock import AsyncMock
     mock_client = MagicMock()
-    mock_client.chat.completions.create.return_value = mock_response
+    mock_client.chat.completions.create = AsyncMock(return_value=mock_response)
     return mock_client
 
 

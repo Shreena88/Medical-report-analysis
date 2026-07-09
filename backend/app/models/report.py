@@ -23,7 +23,16 @@ class LabTest(BaseModel):
     value: float
     unit: str
     reference_range: str
-    status: Literal["LOW", "NORMAL", "HIGH", "UNKNOWN"] = "UNKNOWN"
+    status: Literal[
+        "LOW",
+        "NORMAL",
+        "HIGH",
+        "UNKNOWN",
+        "SLIGHTLY_LOW",
+        "SIGNIFICANTLY_LOW",
+        "SLIGHTLY_HIGH",
+        "SIGNIFICANTLY_HIGH",
+    ] = "UNKNOWN"
     explanation: str | None = None
 
 

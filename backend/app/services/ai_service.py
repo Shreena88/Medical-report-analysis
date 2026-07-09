@@ -111,9 +111,9 @@ def _get_groq_client():
     """
     global _groq_client
     if _groq_client is None:
-        from groq import Groq  # lazy import
+        from groq import AsyncGroq  # lazy import
         from app.config import settings
-        _groq_client = Groq(api_key=settings.GROQ_API_KEY)
+        _groq_client = AsyncGroq(api_key=settings.GROQ_API_KEY)
     return _groq_client
 
 
@@ -161,7 +161,7 @@ async def generate_explanations(tests: list[LabTest]) -> ExplanationResult:
         ]
         user_message = json.dumps({"lab_tests": tests_data})
 
-        response = client.chat.completions.create(
+        response = await client.chat.completions.create(
             model=settings.GROQ_MODEL,
             messages=[
                 {"role": "system", "content": EXPLANATION_SYSTEM_PROMPT},

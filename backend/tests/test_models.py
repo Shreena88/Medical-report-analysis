@@ -15,7 +15,16 @@ from pydantic import ValidationError
 from app.models.report import LabTest
 
 # The only accepted status values
-VALID_STATUSES = {"LOW", "NORMAL", "HIGH", "UNKNOWN"}
+VALID_STATUSES = {
+    "LOW",
+    "NORMAL",
+    "HIGH",
+    "UNKNOWN",
+    "SLIGHTLY_LOW",
+    "SIGNIFICANTLY_LOW",
+    "SLIGHTLY_HIGH",
+    "SIGNIFICANTLY_HIGH",
+}
 
 # A minimal valid LabTest payload — everything except `status` is fixed so
 # that tests focus solely on the status field behavior.

@@ -134,16 +134,16 @@ const DashboardPage: React.FC = () => {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Decorative background glows */}
-      <div className="absolute top-10 right-10 h-[250px] w-[250px] rounded-full bg-indigo-600/5 blur-[80px] pointer-events-none"></div>
+      <div className="absolute top-10 right-10 h-[250px] w-[250px] rounded-full bg-indigo-600/5 dark:bg-indigo-600/5 blur-[80px] pointer-events-none"></div>
 
       <div className="space-y-8">
         {/* Welcome Banner */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-white">
+            <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
               Health Report Analytics
             </h1>
-            <p className="mt-1 text-sm text-slate-400">
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
               Upload laboratory reports to analyze biomarker status and monitor health trends over time.
             </p>
           </div>
@@ -154,23 +154,23 @@ const DashboardPage: React.FC = () => {
 
         {/* Quick Stats Grid */}
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="rounded-xl border border-slate-800 bg-slate-900/30 p-5 backdrop-blur-sm">
+          <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/30 p-5 backdrop-blur-sm shadow-sm transition-colors duration-300">
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Analyzed Reports</p>
-            <h3 className="mt-2 text-3xl font-bold text-slate-100">{totalReports}</h3>
+            <h3 className="mt-2 text-3xl font-bold text-slate-800 dark:text-slate-100">{totalReports}</h3>
           </div>
-          <div className="rounded-xl border border-slate-800 bg-slate-900/30 p-5 backdrop-blur-sm">
+          <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/30 p-5 backdrop-blur-sm shadow-sm transition-colors duration-300">
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Processing Reports</p>
-            <h3 className="mt-2 text-3xl font-bold text-slate-100">{processingReportsCount}</h3>
+            <h3 className="mt-2 text-3xl font-bold text-slate-800 dark:text-slate-100">{processingReportsCount}</h3>
           </div>
-          <div className="rounded-xl border border-slate-800 bg-slate-900/30 p-5 backdrop-blur-sm">
+          <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/30 p-5 backdrop-blur-sm shadow-sm transition-colors duration-300">
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Biomarkers Seeded</p>
-            <h3 className="mt-2 text-3xl font-bold text-violet-400">10 Core</h3>
+            <h3 className="mt-2 text-3xl font-bold text-violet-600 dark:text-violet-400">10 Core</h3>
           </div>
         </div>
 
         {/* Upload and File Drop Area */}
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/20 p-6">
-          <h2 className="text-lg font-bold text-slate-100 mb-4">Analyze New Report</h2>
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/20 p-6 shadow-sm transition-colors duration-300">
+          <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">Analyze New Report</h2>
           
           <div
             onDragEnter={handleDrag}
@@ -179,21 +179,21 @@ const DashboardPage: React.FC = () => {
             onDrop={handleDrop}
             className={`relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center transition-all duration-300 ${
               dragActive
-                ? 'border-violet-500 bg-violet-500/5'
-                : 'border-slate-800 hover:border-slate-700 bg-slate-900/10'
+                ? 'border-violet-500 bg-violet-500/5 dark:bg-violet-500/5'
+                : 'border-slate-200 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700 bg-slate-50/50 dark:bg-slate-900/10'
             }`}
           >
             {uploading ? (
               <div className="flex flex-col items-center gap-4 py-4">
                 <div className="h-10 w-10 animate-spin rounded-full border-4 border-violet-500 border-t-transparent"></div>
                 <div>
-                  <p className="text-sm font-semibold text-slate-200">Uploading file...</p>
-                  <p className="text-xs text-slate-400 mt-1">Starting the AI diagnostic processing pipeline</p>
+                  <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Uploading file...</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Starting the AI diagnostic processing pipeline</p>
                 </div>
               </div>
             ) : (
               <>
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-800/80 text-violet-400 mb-4 border border-slate-700">
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800/80 text-violet-600 dark:text-violet-400 mb-4 border border-slate-200 dark:border-slate-700 shadow-sm transition-colors duration-300">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -209,9 +209,9 @@ const DashboardPage: React.FC = () => {
                     />
                   </svg>
                 </div>
-                <p className="text-sm font-semibold text-slate-200">
+                <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
                   Drag and drop your medical report here, or{' '}
-                  <label className="text-violet-400 hover:text-violet-300 cursor-pointer transition-colors">
+                  <label className="text-violet-600 hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300 cursor-pointer transition-colors">
                     browse
                     <input
                       type="file"
@@ -221,7 +221,7 @@ const DashboardPage: React.FC = () => {
                     />
                   </label>
                 </p>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Supports PDF, PNG, or JPEG (Max 10 MB)
                 </p>
               </>
@@ -229,7 +229,7 @@ const DashboardPage: React.FC = () => {
           </div>
 
           {uploadError && (
-            <div className="mt-4 flex gap-2.5 rounded-lg border border-rose-500/20 bg-rose-500/5 p-3.5 text-xs text-rose-400">
+            <div className="mt-4 flex gap-2.5 rounded-lg border border-rose-500/20 bg-rose-500/5 p-3.5 text-xs text-rose-600 dark:text-rose-400">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -251,19 +251,19 @@ const DashboardPage: React.FC = () => {
 
         {/* Reports History */}
         <div className="space-y-4">
-          <h2 className="text-xl font-bold text-slate-100">Reports History</h2>
+          <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">Reports History</h2>
           
           {loading ? (
             <div className="flex justify-center py-12">
               <div className="h-8 w-8 animate-spin rounded-full border-3 border-violet-500 border-t-transparent"></div>
             </div>
           ) : error ? (
-            <div className="rounded-lg border border-rose-500/20 bg-rose-500/5 p-4 text-center text-sm text-rose-450">
+            <div className="rounded-lg border border-rose-500/20 bg-rose-500/5 p-4 text-center text-sm text-rose-600 dark:text-rose-400">
               {error}
             </div>
           ) : reports.length === 0 ? (
-            <div className="rounded-xl border border-slate-800 bg-slate-900/10 p-12 text-center">
-              <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-lg bg-slate-800 text-slate-400 border border-slate-700 mb-3">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/10 p-12 text-center shadow-sm transition-colors duration-300">
+              <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 mb-3 transition-colors duration-300">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -279,8 +279,8 @@ const DashboardPage: React.FC = () => {
                   />
                 </svg>
               </div>
-              <h3 className="text-sm font-semibold text-slate-300">No reports analyzed yet</h3>
-              <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto leading-normal">
+              <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">No reports analyzed yet</h3>
+              <p className="text-xs text-slate-550 dark:text-slate-400 mt-1 max-w-sm mx-auto leading-normal">
                 Upload your first laboratory report above to get a comprehensive biomarker extraction and AI analysis.
               </p>
             </div>

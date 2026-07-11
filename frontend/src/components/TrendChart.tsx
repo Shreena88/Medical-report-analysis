@@ -12,6 +12,7 @@ import {
   Filler,
   ChartOptions,
 } from 'chart.js';
+import { useTheme } from '../contexts/ThemeContext';
 
 ChartJS.register(
   CategoryScale,
@@ -37,6 +38,9 @@ interface TrendChartProps {
 }
 
 const TrendChart: React.FC<TrendChartProps> = ({ testName, data, unit }) => {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
   // Sort data by uploaded_at date ascending for proper timeline plotting
   const sortedData = [...data].sort(
     (a, b) => new Date(a.uploaded_at).getTime() - new Date(b.uploaded_at).getTime()
@@ -64,7 +68,7 @@ const TrendChart: React.FC<TrendChartProps> = ({ testName, data, unit }) => {
         tension: 0.3,
         fill: true,
         pointBackgroundColor: 'rgb(139, 92, 246)',
-        pointBorderColor: '#0f172a', // Slate 900
+        pointBorderColor: isDark ? '#0f172a' : '#ffffff', // Slate 900 vs white
         pointBorderWidth: 2,
         pointRadius: 5,
         pointHoverRadius: 7,
@@ -80,10 +84,10 @@ const TrendChart: React.FC<TrendChartProps> = ({ testName, data, unit }) => {
         display: false,
       },
       tooltip: {
-        backgroundColor: '#1e293b', // Slate 800
-        titleColor: '#f8fafc',
-        bodyColor: '#cbd5e1',
-        borderColor: '#334155',
+        backgroundColor: isDark ? '#1e293b' : '#ffffff',
+        titleColor: isDark ? '#f8fafc' : '#0f172a',
+        bodyColor: isDark ? '#cbd5e1' : '#334155',
+        borderColor: isDark ? '#334155' : '#e2e8f0',
         borderWidth: 1,
         padding: 12,
         displayColors: false,
@@ -99,10 +103,10 @@ const TrendChart: React.FC<TrendChartProps> = ({ testName, data, unit }) => {
     scales: {
       x: {
         grid: {
-          color: 'rgba(51, 65, 85, 0.2)', // Slate 700 with opacity
+          color: isDark ? 'rgba(51, 65, 85, 0.2)' : 'rgba(15, 23, 42, 0.06)',
         },
         ticks: {
-          color: '#94a3b8', // Slate 400
+          color: isDark ? '#94a3b8' : '#475569',
           font: {
             size: 10,
           },
@@ -110,10 +114,10 @@ const TrendChart: React.FC<TrendChartProps> = ({ testName, data, unit }) => {
       },
       y: {
         grid: {
-          color: 'rgba(51, 65, 85, 0.2)',
+          color: isDark ? 'rgba(51, 65, 85, 0.2)' : 'rgba(15, 23, 42, 0.06)',
         },
         ticks: {
-          color: '#94a3b8',
+          color: isDark ? '#94a3b8' : '#475569',
           font: {
             size: 10,
           },
@@ -123,10 +127,10 @@ const TrendChart: React.FC<TrendChartProps> = ({ testName, data, unit }) => {
   };
 
   return (
-    <div className="rounded-xl border border-slate-800 bg-slate-900/20 p-5">
+    <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/20 p-5 shadow-sm transition-colors duration-300">
       <div className="flex items-center justify-between mb-4">
-        <h4 className="text-sm font-bold tracking-wide text-slate-200">{testName} Trend</h4>
-        <span className="text-[11px] font-semibold text-slate-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
+        <h4 className="text-sm font-bold tracking-wide text-slate-800 dark:text-slate-200">{testName} Trend</h4>
+        <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">
           Unit: {unit}
         </span>
       </div>

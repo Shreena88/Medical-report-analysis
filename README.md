@@ -1,6 +1,6 @@
-# InstAnalytics — AI Medical Report Analyzer
+# PulseAnalytics — AI Medical Report Analyzer
 
-InstAnalytics is a full-stack, AI-powered health intelligence web application designed to help users upload, OCR-process, analyze, and monitor physiological biomarker trends from clinical laboratory reports. 
+PulseAnalytics is a full-stack, AI-powered health intelligence web application designed to help users upload, OCR-process, analyze, and monitor physiological biomarker trends from clinical laboratory reports. 
 
 Using **FastAPI** on the backend, **MongoDB** for persistence, **EasyOCR** for text digitization, **Groq Cloud (Llama 3.3 70B)** for structured medical extraction and context generation, and **React + TypeScript + Tailwind CSS** on the frontend, this app provides real-time feedback and timeline visualization of blood work metrics.
 

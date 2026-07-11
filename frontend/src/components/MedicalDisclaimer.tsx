@@ -2,11 +2,11 @@ import React from 'react';
 
 const MedicalDisclaimer: React.FC = () => {
   return (
-    <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 text-amber-400">
+    <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 dark:bg-amber-500/5 p-4 text-amber-800 dark:text-amber-400">
       <div className="flex gap-3">
         <div className="flex-shrink-0">
           <svg
-            className="h-5 w-5 text-amber-500"
+            className="h-5 w-5 text-amber-600 dark:text-amber-500"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -21,8 +21,8 @@ const MedicalDisclaimer: React.FC = () => {
           </svg>
         </div>
         <div>
-          <h3 className="text-sm font-semibold tracking-wide uppercase">Medical Disclaimer</h3>
-          <p className="mt-1 text-sm text-amber-400/80 leading-relaxed">
+          <h3 className="text-sm font-bold tracking-wide uppercase text-amber-900 dark:text-amber-400">Medical Disclaimer</h3>
+          <p className="mt-1 text-sm text-amber-800/90 dark:text-amber-400/80 leading-relaxed">
             This application is for educational purposes only. It is not a substitute for professional medical advice, 
             diagnosis, or treatment. Always consult with a qualified healthcare provider regarding a medical condition.
           </p>

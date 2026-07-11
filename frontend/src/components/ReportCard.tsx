@@ -63,13 +63,13 @@ const ReportCard: React.FC<ReportCardProps> = ({ report, onDeleteClick }) => {
   const statusInfo = getStatusDisplay(report.status);
 
   return (
-    <div className="group relative rounded-xl border border-slate-800 bg-slate-900/40 p-5 backdrop-blur-sm transition-all duration-300 hover:border-slate-700 hover:bg-slate-900/60 hover:shadow-lg hover:shadow-violet-950/10">
+    <div className="group relative rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/40 p-5 backdrop-blur-sm transition-all duration-300 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-violet-950/10">
       <div className="flex flex-col gap-4">
         {/* Header (File Name and Status Badge) */}
         <div className="flex items-start justify-between gap-3">
           <Link
             to={`/report/${report.id}`}
-            className="flex-1 font-semibold text-slate-100 hover:text-violet-400 transition-colors line-clamp-1 break-all"
+            className="flex-1 font-semibold text-slate-800 dark:text-slate-100 hover:text-violet-600 dark:hover:text-violet-400 transition-colors line-clamp-1 break-all"
           >
             {report.file_name}
           </Link>
@@ -81,22 +81,22 @@ const ReportCard: React.FC<ReportCardProps> = ({ report, onDeleteClick }) => {
         </div>
 
         {/* Date and details */}
-        <div className="flex items-center justify-between text-xs text-slate-400">
+        <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
           <span>Uploaded {formattedDate}</span>
         </div>
 
         {/* Short Summary (if available) */}
         {report.status === 'complete' && report.summary && (
-          <p className="text-xs text-slate-400 leading-relaxed line-clamp-2 mt-1">
+          <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-2 mt-1">
             {report.summary}
           </p>
         )}
 
         {/* Action Tray */}
-        <div className="flex items-center justify-between mt-2 pt-3 border-t border-slate-800/80">
+        <div className="flex items-center justify-between mt-2 pt-3 border-t border-slate-100 dark:border-slate-800/80">
           <Link
             to={`/report/${report.id}`}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-violet-400 hover:text-violet-300 transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-violet-600 hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300 transition-colors"
           >
             View Analysis
             <svg
@@ -113,7 +113,7 @@ const ReportCard: React.FC<ReportCardProps> = ({ report, onDeleteClick }) => {
 
           <button
             onClick={(e) => onDeleteClick(report.id, e)}
-            className="rounded p-1 text-slate-500 hover:bg-slate-800 hover:text-rose-400 transition-all duration-200"
+            className="rounded p-1 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-rose-600 dark:hover:text-rose-400 transition-all duration-200"
             title="Delete Report"
           >
             <svg

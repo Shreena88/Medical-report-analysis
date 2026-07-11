@@ -34,10 +34,10 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-12 sm:px-6 lg:px-8">
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 py-12 sm:px-6 lg:px-8 transition-colors duration-300">
       {/* Decorative background glows */}
-      <div className="absolute top-1/4 left-1/4 h-[300px] w-[300px] rounded-full bg-violet-600/10 blur-[100px]"></div>
-      <div className="absolute bottom-1/4 right-1/4 h-[300px] w-[300px] rounded-full bg-indigo-600/10 blur-[100px]"></div>
+      <div className="absolute top-1/4 left-1/4 h-[300px] w-[300px] rounded-full bg-violet-600/5 dark:bg-violet-600/10 blur-[100px]"></div>
+      <div className="absolute bottom-1/4 right-1/4 h-[300px] w-[300px] rounded-full bg-indigo-600/5 dark:bg-indigo-600/10 blur-[100px]"></div>
 
       <div className="z-10 w-full max-w-md space-y-8">
         <div className="text-center">
@@ -54,22 +54,27 @@ const LoginPage: React.FC = () => {
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.03 0 1.9.693 2.166 1.638m-7.377 12.408.062-3.278a2.25 2.25 0 0 1 1.222-1.928l5.882-3.267"
+                d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6.5 9.5h1.5l1.5-2.5 1.5 4.5 1.5-3.5 1.5 1.5h1.5"
               />
             </svg>
           </div>
-          <h2 className="mt-6 text-3xl font-extrabold tracking-tight text-white">
+          <h2 className="mt-6 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
             Welcome back
           </h2>
-          <p className="mt-2 text-sm text-slate-400">
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
             Sign in to access your lab report analyses
           </p>
         </div>
 
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-8 shadow-xl backdrop-blur-xl">
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-8 shadow-xl backdrop-blur-xl transition-colors duration-300">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
-              <div className="flex gap-2.5 rounded-lg border border-rose-500/20 bg-rose-500/5 p-3.5 text-xs text-rose-400">
+              <div className="flex gap-2.5 rounded-lg border border-rose-500/20 bg-rose-500/5 p-3.5 text-xs text-rose-600 dark:text-rose-400">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -89,7 +94,7 @@ const LoginPage: React.FC = () => {
             )}
 
             <div>
-              <label htmlFor="email" className="block text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <label htmlFor="email" className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Email Address
               </label>
               <div className="mt-1.5">
@@ -102,13 +107,13 @@ const LoginPage: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
-                  className="block w-full rounded-lg border border-slate-700 bg-slate-850 px-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none transition-all duration-200 hover:border-slate-650 focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
+                  className="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-4 py-2.5 text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none transition-all duration-200 focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <label htmlFor="password" className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Password
               </label>
               <div className="mt-1.5">
@@ -121,7 +126,7 @@ const LoginPage: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="block w-full rounded-lg border border-slate-700 bg-slate-850 px-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none transition-all duration-200 hover:border-slate-650 focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
+                  className="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-4 py-2.5 text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none transition-all duration-200 focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
                 />
               </div>
             </div>
@@ -142,8 +147,8 @@ const LoginPage: React.FC = () => {
           </form>
 
           <div className="mt-6 text-center text-xs">
-            <span className="text-slate-400">Don't have an account? </span>
-            <Link to="/signup" className="font-semibold text-violet-400 hover:text-violet-300 transition-colors">
+            <span className="text-slate-500 dark:text-slate-400">Don't have an account? </span>
+            <Link to="/signup" className="font-semibold text-violet-600 hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300 transition-colors">
               Sign Up
             </Link>
           </div>

@@ -48,6 +48,7 @@ mongomock.SERVER_VERSION = "4.4.0"
 
 from app.models.report import LabTest
 from app.services.ai_service import ExplanationResult
+from app.services.classifier import ClassificationError, ClassificationResult
 from app.services.extractor import ExtractionError
 from app.services.ocr_service import OCRError
 from app.services.report_service import run_pipeline
@@ -66,7 +67,7 @@ _STATUS_SEQUENCE = [
 ]
 
 # Terminal failure statuses — can only appear at specific positions.
-_FAILURE_STATUSES = {"failed_ocr", "failed_extraction"}
+_FAILURE_STATUSES = {"failed_ocr", "failed_classification", "failed_extraction"}
 
 # Map each status to its ordinal position (higher = further along).
 _STATUS_ORDER: dict[str, int] = {s: i for i, s in enumerate(_STATUS_SEQUENCE)}
@@ -74,12 +75,20 @@ _STATUS_ORDER: dict[str, int] = {s: i for i, s in enumerate(_STATUS_SEQUENCE)}
 # always count as "forward" relative to the step they follow, but we treat them
 # specially in the monotonicity check.
 _STATUS_ORDER["failed_ocr"] = 10
-_STATUS_ORDER["failed_extraction"] = 11
+_STATUS_ORDER["failed_classification"] = 11
+_STATUS_ORDER["failed_extraction"] = 12
 
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
+@pytest.fixture(autouse=True)
+def mock_classifier():
+    """Autouse fixture to mock classification as successful by default."""
+    with patch("app.services.report_service.classify_document") as mock:
+        mock.return_value = ClassificationResult(
+            is_medical_report=True,
+            confidence=0.98,
+            report_type="CBC",
+        )
+        yield mock
 
 
 async def _make_db_with_report(report_id: ObjectId) -> Any:
@@ -181,18 +190,22 @@ def _is_monotonically_forward(statuses: list[str]) -> bool:
 
 @given(
     ocr_succeeds=st.booleans(),
+    classification_succeeds=st.booleans(),
+    is_medical_report=st.booleans(),
     extraction_succeeds=st.booleans(),
 )
 @settings(max_examples=200)
 def test_property5_status_never_regresses(
     ocr_succeeds: bool,
+    classification_succeeds: bool,
+    is_medical_report: bool,
     extraction_succeeds: bool,
 ) -> None:
     """Property 5: Report status only ever moves forward and never regresses.
 
-    Generates scenarios where OCR and/or Extraction may fail, then verifies
-    the sequence of status values written to MongoDB is strictly monotonically
-    forward.
+    Generates scenarios where OCR, Classification, and/or Extraction may fail,
+    then verifies the sequence of status values written to MongoDB is strictly
+    monotonically forward.
 
     **Validates: Requirements 3.2, 3.3**
     """
@@ -209,6 +222,19 @@ def test_property5_status_never_regresses(
             ocr_provider = MagicMock()
             ocr_provider.extract_text.side_effect = OCRError("OCR failed")
 
+        # --- Classifier mock ---
+        if classification_succeeds:
+            mock_classify = AsyncMock(
+                return_value=ClassificationResult(
+                    is_medical_report=is_medical_report,
+                    confidence=0.98 if is_medical_report else 0.99,
+                    report_type="CBC" if is_medical_report else None,
+                    reason=None if is_medical_report else "Invoice details found.",
+                )
+            )
+        else:
+            mock_classify = AsyncMock(side_effect=ClassificationError("Classification failed"))
+
         # --- Extractor mock ---
         if extraction_succeeds:
             mock_extract = AsyncMock(return_value=_sample_lab_tests())
@@ -223,6 +249,7 @@ def test_property5_status_never_regresses(
 
         with (
             patch("app.services.report_service.get_ocr_provider", return_value=ocr_provider),
+            patch("app.services.report_service.classify_document", mock_classify),
             patch("app.services.report_service.extract_tests", mock_extract),
             patch("app.services.report_service.check_ranges", mock_check_ranges),
             patch("app.services.report_service.generate_explanations", mock_generate),
@@ -248,6 +275,8 @@ def test_property5_status_never_regresses(
         # Determine the expected final status based on step outcomes
         if not ocr_succeeds:
             expected_final = "failed_ocr"
+        elif not classification_succeeds or not is_medical_report:
+            expected_final = "failed_classification"
         elif not extraction_succeeds:
             expected_final = "failed_extraction"
         else:
@@ -255,7 +284,8 @@ def test_property5_status_never_regresses(
 
         assert final_status == expected_final, (
             f"Expected final status {expected_final!r}, got {final_status!r}. "
-            f"ocr_succeeds={ocr_succeeds}, extraction_succeeds={extraction_succeeds}"
+            f"ocr_succeeds={ocr_succeeds}, classification_succeeds={classification_succeeds}, "
+            f"is_medical_report={is_medical_report}, extraction_succeeds={extraction_succeeds}"
         )
 
         # Verify the status reached is NOT "pending" — the pipeline always advances
@@ -631,3 +661,120 @@ async def test_pipeline_check_ranges_receives_gender() -> None:
         )
 
     assert received_gender == ["female"]
+
+
+@pytest.mark.asyncio
+async def test_pipeline_stores_classification_metadata_on_success() -> None:
+    """Classification metadata is persisted in the Report document on success."""
+    report_id = ObjectId()
+    db = await _make_db_with_report(report_id)
+
+    ocr_provider = MagicMock()
+    ocr_provider.extract_text.return_value = "Sample OCR text"
+
+    mock_classify = AsyncMock(
+        return_value=ClassificationResult(
+            is_medical_report=True,
+            confidence=0.98,
+            report_type="CBC",
+        )
+    )
+    mock_extract = AsyncMock(return_value=_sample_lab_tests())
+    mock_check_ranges = AsyncMock(return_value=_sample_lab_tests())
+    mock_generate = AsyncMock(return_value=_sample_explanation_result())
+
+    with (
+        patch("app.services.report_service.get_ocr_provider", return_value=ocr_provider),
+        patch("app.services.report_service.classify_document", mock_classify),
+        patch("app.services.report_service.extract_tests", mock_extract),
+        patch("app.services.report_service.check_ranges", mock_check_ranges),
+        patch("app.services.report_service.generate_explanations", mock_generate),
+        patch("app.services.report_service.get_database", return_value=db),
+    ):
+        await run_pipeline(
+            report_id=str(report_id),
+            file_path="fake/path/report.pdf",
+            user_id="user123",
+            gender="male",
+        )
+
+    doc = await db["reports"].find_one({"_id": report_id})
+    assert doc is not None
+    assert doc["is_medical_report"] is True
+    assert doc["confidence"] == 0.98
+    assert doc["report_type"] == "CBC"
+    assert doc["status"] == "complete"
+
+
+@pytest.mark.asyncio
+async def test_pipeline_stops_on_classification_failure() -> None:
+    """On classification service failure, error_message is stored and status is failed_classification."""
+    report_id = ObjectId()
+    db = await _make_db_with_report(report_id)
+
+    ocr_provider = MagicMock()
+    ocr_provider.extract_text.return_value = "Sample OCR text"
+
+    mock_classify = AsyncMock(side_effect=ClassificationError("Model connection failed"))
+
+    # Extractor, check ranges and generate explanations shouldn't run
+    mock_extract = AsyncMock(side_effect=AssertionError("Extractor should not run"))
+
+    with (
+        patch("app.services.report_service.get_ocr_provider", return_value=ocr_provider),
+        patch("app.services.report_service.classify_document", mock_classify),
+        patch("app.services.report_service.extract_tests", mock_extract),
+        patch("app.services.report_service.get_database", return_value=db),
+    ):
+        await run_pipeline(
+            report_id=str(report_id),
+            file_path="fake/path/report.pdf",
+            user_id="user123",
+            gender="male",
+        )
+
+    doc = await db["reports"].find_one({"_id": report_id})
+    assert doc is not None
+    assert doc["status"] == "failed_classification"
+    assert "Model connection failed" in doc["error_message"]
+
+
+@pytest.mark.asyncio
+async def test_pipeline_stops_on_non_medical_report() -> None:
+    """When document is classified as not a medical report, pipeline stops with failed_classification status."""
+    report_id = ObjectId()
+    db = await _make_db_with_report(report_id)
+
+    ocr_provider = MagicMock()
+    ocr_provider.extract_text.return_value = "Sample OCR text"
+
+    mock_classify = AsyncMock(
+        return_value=ClassificationResult(
+            is_medical_report=False,
+            confidence=0.99,
+            reason="The document appears to be an invoice.",
+        )
+    )
+
+    mock_extract = AsyncMock(side_effect=AssertionError("Extractor should not run"))
+
+    with (
+        patch("app.services.report_service.get_ocr_provider", return_value=ocr_provider),
+        patch("app.services.report_service.classify_document", mock_classify),
+        patch("app.services.report_service.extract_tests", mock_extract),
+        patch("app.services.report_service.get_database", return_value=db),
+    ):
+        await run_pipeline(
+            report_id=str(report_id),
+            file_path="fake/path/report.pdf",
+            user_id="user123",
+            gender="male",
+        )
+
+    doc = await db["reports"].find_one({"_id": report_id})
+    assert doc is not None
+    assert doc["status"] == "failed_classification"
+    assert doc["is_medical_report"] is False
+    assert doc["confidence"] == 0.99
+    assert doc["reason"] == "The document appears to be an invoice."
+    assert "The document appears to be an invoice. Please upload a valid medical laboratory report." in doc["error_message"]

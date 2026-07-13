@@ -128,7 +128,7 @@ const DashboardPage: React.FC = () => {
   // Stats calculation
   const totalReports = reports.length;
   const processingReportsCount = reports.filter(
-    (r) => !['complete', 'failed_ocr', 'failed_extraction'].includes(r.status)
+    (r) => !['complete', 'failed_ocr', 'failed_extraction', 'failed_classification'].includes(r.status)
   ).length;
 
   return (

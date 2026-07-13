@@ -32,6 +32,7 @@ const ReportCard: React.FC<ReportCardProps> = ({ report, onDeleteClick }) => {
         };
       case 'failed_ocr':
       case 'failed_extraction':
+      case 'failed_classification':
         return {
           label: 'Failed',
           class: 'bg-rose-500/10 text-rose-400 border-rose-500/20',

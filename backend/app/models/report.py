@@ -71,6 +71,10 @@ class Report(BaseModel):
     uploaded_at: datetime
     status: str
     ocr_text: str | None = None
+    is_medical_report: bool | None = None
+    confidence: float | None = None
+    report_type: str | None = None
+    reason: str | None = None
     lab_tests: list[LabTest] = []
     summary: str | None = None
     clinical_overview: ClinicalOverview | None = None

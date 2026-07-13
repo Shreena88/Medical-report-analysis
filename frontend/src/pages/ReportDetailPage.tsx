@@ -39,6 +39,10 @@ interface Report {
   summary: string | null;
   clinical_overview: ClinicalOverview | null;
   error_message: string | null;
+  is_medical_report?: boolean;
+  confidence?: number;
+  report_type?: string;
+  reason?: string;
 }
 
 const ReportDetailPage: React.FC = () => {
@@ -153,7 +157,7 @@ const ReportDetailPage: React.FC = () => {
   if (!report) return null;
 
   const isProcessing = ['pending', 'ocr_complete', 'extracted', 'validated'].includes(report.status);
-  const isFailed = ['failed_ocr', 'failed_extraction'].includes(report.status);
+  const isFailed = ['failed_ocr', 'failed_extraction', 'failed_classification'].includes(report.status);
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">

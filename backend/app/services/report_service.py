@@ -21,6 +21,7 @@ from bson import ObjectId
 from app.database import get_database
 from app.models.report import LabTest
 from app.services.ai_service import generate_explanations
+from app.services.classifier import ClassificationError, classify_document
 from app.services.extractor import ExtractionError, extract_tests
 from app.services.ocr_service import OCRError, get_ocr_provider
 from app.services.reference_checker import check_ranges
@@ -87,6 +88,54 @@ async def run_pipeline(
         {"_id": oid},
         {"$set": {"ocr_text": ocr_text, "status": "ocr_complete"}},
     )
+
+    # ------------------------------------------------------------------
+    # Step 1.5 — Classification
+    # ------------------------------------------------------------------
+    try:
+        classification = await classify_document(ocr_text)
+    except ClassificationError as exc:
+        logger.error("run_pipeline[%s]: classification failed: %s", report_id, exc)
+        await db["reports"].update_one(
+            {"_id": oid},
+            {"$set": {"status": "failed_classification", "error_message": str(exc)}},
+        )
+        return
+    except Exception as exc:  # noqa: BLE001
+        logger.error(
+            "run_pipeline[%s]: unexpected error during classification: %s",
+            report_id,
+            exc,
+            exc_info=True,
+        )
+        await db["reports"].update_one(
+            {"_id": oid},
+            {"$set": {"status": "failed_classification", "error_message": str(exc)}},
+        )
+        return
+
+    # Update classification result in DB
+    await db["reports"].update_one(
+        {"_id": oid},
+        {
+            "$set": {
+                "is_medical_report": classification.is_medical_report,
+                "confidence": classification.confidence,
+                "report_type": classification.report_type,
+                "reason": classification.reason,
+            }
+        },
+    )
+
+    if not classification.is_medical_report:
+        reason = classification.reason or "The document is not recognized as a medical laboratory report."
+        error_msg = f"{reason} Please upload a valid medical laboratory report."
+        logger.info("run_pipeline[%s]: classification failed (not a medical report): %s", report_id, error_msg)
+        await db["reports"].update_one(
+            {"_id": oid},
+            {"$set": {"status": "failed_classification", "error_message": error_msg}},
+        )
+        return
 
     # ------------------------------------------------------------------
     # Step 2 — Extraction
